@@ -1,0 +1,55 @@
+;Write a program to display a string with uppercase and lowercase letters on the
+;VDU. When your program starts up, it should convert all lowercase letters on the 
+;VDU to uppercase and all uppercase letters to lowercase.
+
+	ORG C0 ; top left of VDU
+	DB 48
+	DB 65
+	DB 6C
+	DB 6C
+	DB 6F
+	DB 57
+	DB 6F
+	DB 72
+	DB 6C
+	DB 64 ; hELLOwOrld 
+	DB 00   ; PUT 00 AT END OF STRING TO MARK THE END
+
+
+;---main program starts at 00
+	ORG 00
+	MOV AL, C0 ; GET WHATEVERS IN VDU POSITION [C0]
+
+
+LOOP:
+
+	MOV BL, [AL] ; MOVE HEX VALUE (LETTER) INTO BL REGISTER
+	CMP BL, 00   ; CHECK IF VALUE IS 00 (END OF STRING)
+	JZ LOOPEND   ;IF IT IS, EXIT THE LOOP
+	
+	MOV CL, [AL] ; MOV HEX VALUE (LETTER) INTO CL REGISTER (MAKE A COPY)
+	SUB BL , 5B ; TAKE AWAY 5B (91 DECIMAL) TO SEE IF SIGN FLAG IS SET
+	JS ISCAPITAL
+	JMP ISLOWER
+	
+
+
+
+ISCAPITAL:
+	
+	ADD CL, 20  ; ADD 20 TO HEX VALUE TO CONVERT TO LOWERCASE
+	MOV[AL] , CL  ; MOVE VALUE INTO VDU
+	INC AL    ; GET NEXT POSITION IN VDU
+	
+	JMP LOOP
+
+
+ISLOWER:
+	
+	SUB CL , 20  ; SUBTRACT 20 FROM HEX VALUE TO CONVERT TO CAPITAL
+	MOV [AL], CL  ; MOVE VALUE INTO VDU
+	INC AL  ; GET NEXT POSITION IN VDU
+	JMP LOOP
+
+LOOPEND:
+	END
